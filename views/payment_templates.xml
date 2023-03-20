@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="tap_redirect_form">
+        <!-- Tap generates a unique URL for each payment request -->
+        <form t-att-action="api_url" method="get">
+            <input type="hidden" name="mode" t-att-value="mode"/>
+            <input type="hidden" name="token" t-att-value="token"/>
+        </form>
+    </template>
+</odoo>
