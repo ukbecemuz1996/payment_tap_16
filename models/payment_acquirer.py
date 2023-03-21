@@ -7,10 +7,11 @@ _logger = logging.getLogger(__name__)
 
 
 class PaymentAcquirer(models.Model):
-    _inherit = 'payment.acquirer'
+    _inherit = 'payment.provider'
 
-    provider = fields.Selection(
+    code = fields.Selection(
         selection_add=[('tap', 'Tap')], ondelete={'tap': 'set default'})
+    
 
     tap_public_key = fields.Char(
         string="Publishable Key",
@@ -24,11 +25,11 @@ class PaymentAcquirer(models.Model):
     tap_merchant_id = fields.Char(
         string="Merchant ID", required_if_provider="tap", groups="base.group_system")
 
-    def _get_default_payment_method_id(self):
-        self.ensure_one()
-        if self.provider != 'tap':
-            return super()._get_default_payment_method_id()
-        return self.env.ref('payment_tap.payment_method_tap').id
+    # def _get_default_payment_method_id(self):
+    #     self.ensure_one()
+    #     if self.provider != 'tap':
+    #         return super()._get_default_payment_method_id()
+    #     return self.env.ref('payment_tap.payment_method_tap').id
 
     def _tap_make_request(self, data=None, method='POST'):
         """ Make a request at tap endpoint.

@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
 
-    <record id="payment_acquirer_tap" model="payment.acquirer">
+    <record id="payment_acquirer_tap" model="payment.provider">
         <field name="name">Tap</field>
-        <field name="provider">tap</field>
-        <field name="support_authorization">False</field>
-        <field name="support_fees_computation">False</field>
-        <field name="support_refund"></field>
-        <field name="support_tokenization">True</field>
+        <field name="code">tap</field>
         <field name="allow_tokenization">True</field>
     </record>
 

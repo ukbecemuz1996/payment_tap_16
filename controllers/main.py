@@ -15,7 +15,7 @@ class TapController(http.Controller):
     _return_url = "/payment/tap/return"
 
     @http.route(
-        _return_url, type='http', auth='public', methods=['GET'], csrf=False,
+        _return_url, type='http', auth='public', methods=['GET','POST'], csrf=False,
         save_session=False
     )
     def tap_return(self, **data):
@@ -33,6 +33,5 @@ class TapController(http.Controller):
                           embedded in the return URL
         """
         _logger.info("Received Tap return data:\n%s", pprint.pformat(data))
-        request.env['payment.transaction'].sudo(
-        )._handle_feedback_data('tap', data)
+        request.env['payment.transaction'].sudo()._handle_notification_data('tap', data)
         return request.redirect('/payment/status')

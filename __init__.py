@@ -9,4 +9,4 @@ def post_init_hook(cr, registry):
     setup_provider(cr, registry, 'tap')
 
 def uninstall_hook(cr, registry):
-    reset_payment_acquirer(cr, registry, 'tap')
+    reset_payment_provider(cr, registry, 'tap')

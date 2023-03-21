@@ -21,14 +21,14 @@ class PaymentTransaction(models.Model):
         :rtype: dict
         """
         res = super()._get_specific_rendering_values(processing_values)
-        if self.provider != 'tap':
+        if self.provider_code != 'tap':
             return res
 
         payload = self._tap_prepare_payment_request_payload()
-        payment_data = self.acquirer_id._tap_make_request(data=payload)
+        payment_data = self.provider_id._tap_make_request(data=payload)
 
         token = payment_data["token"]
-        self.acquirer_reference = token
+        self.reference = token
         api_url = "https://checkout.payments.tap.company/"
         _logger.debug(api_url)
 
@@ -42,12 +42,13 @@ class PaymentTransaction(models.Model):
         """
         user_lang = self.env.context.get('lang')
         phone = phonenumbers.parse(self.partner_phone)
-        base_url = self.acquirer_id.get_base_url()
+        base_url = self.provider_id.get_base_url()
         redirect_url = urls.url_join(base_url, TapController._return_url)
         return {
             "gateway": {
-                "publicKey": self.acquirer_id.tap_public_key,
-                "merchantId": self.acquirer_id.tap_merchant_id,
+                "publicKey": self.provider_id.tap_public_key,
+                "merchantId": self.provider_id.tap_merchant_id,
+                # "merchantId": None,
                 "contactInfo": True,
                 "customerCards": True,
                 "language": "en",
@@ -137,7 +138,7 @@ class PaymentTransaction(models.Model):
             }
         }
 
-    def _process_feedback_data(self, data):
+    def _process_notification_data(self, data):
         """ Override of payment to process the transaction based on Mollie data.
 
         Note: self.ensure_one()
@@ -145,11 +146,13 @@ class PaymentTransaction(models.Model):
         :param dict data: The feedback data sent by the provider
         :return: None
         """
-        super()._process_feedback_data(data)
-        if self.provider != 'tap':
+        self.ensure_one()
+
+        super()._process_notification_data(data)
+        if self.provider_code != 'tap':
             return
 
-        payment_data = self.acquirer_id._tap_check_response(data.get("tap_id"))
+        payment_data = self.provider_id._tap_check_response(data.get("tap_id"))
         payment_status = payment_data['response']['code']
 
         if payment_status == '200':
@@ -162,7 +165,7 @@ class PaymentTransaction(models.Model):
             self._set_canceled(
                 "Tap: " + _("Canceled payment with status: %s", payment_data['response']['message']))
 
-    def _get_tx_from_feedback_data(self, provider, data):
+    def _get_tx_from_notification_data(self, provider_code, data):
         """ Override of payment to find the transaction based on Mollie data.
 
         :param str provider: The provider of the acquirer that handled the transaction
@@ -171,12 +174,12 @@ class PaymentTransaction(models.Model):
         :rtype: recordset of `payment.transaction`
         :raise: ValidationError if the data match no transaction
         """
-        tx = super()._get_tx_from_feedback_data(provider, data)
-        if provider != 'tap':
+        tx = super()._get_tx_from_notification_data(provider_code, data)
+        if provider_code != 'tap':
             return tx
 
-        tx = self.search([('acquirer_reference', '=', data.get('token')),
-                         ('provider', '=', 'tap')])
+        tx = self.search([('reference', '=', data.get('token')),
+                         ('provider_code', '=', 'tap')])
         if not tx:
             raise ValidationError(
                 "Tap: " +

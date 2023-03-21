@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <record id="payment_acquirer_form" model="ir.ui.view">
+    <record id="payment_provider_form" model="ir.ui.view">
         <field name="name">Tap Acquirer Form</field>
-        <field name="model">payment.acquirer</field>
-        <field name="inherit_id" ref="payment.payment_acquirer_form"/>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='acquirer']" position="inside">
-                <group attrs="{'invisible': [('provider', '!=', 'tap')]}">
-                    <field name="tap_merchant_id" attrs="{'required':[('provider', '=', 'tap'), ('state', '!=', 'disabled')]}" password="False"/>
-                    <field name="tap_public_key" attrs="{'required':[('provider', '=', 'tap'), ('state', '!=', 'disabled')]}" password="False"/>
-                    <field name="tap_secret_key" attrs="{'required':[('provider', '=', 'tap'), ('state', '!=', 'disabled')]}" password="True"/>
+            <group name="provider_credentials" position="inside" >
+                <group  attrs="{'invisible': [('code', '!=', 'tap')]}">
+                    <field name="tap_merchant_id" attrs="{'required':[('code', '=', 'tap'), ('state', '!=', 'disabled')]}" password="False"/>
+                    <field name="tap_public_key" attrs="{'required':[('code', '=', 'tap'), ('state', '!=', 'disabled')]}" password="False"/>
+                    <field name="tap_secret_key" attrs="{'required':[('code', '=', 'tap'), ('state', '!=', 'disabled')]}" password="True"/>
                 </group>
-            </xpath>
+            </group>
         </field>
     </record>
-
 </odoo>
