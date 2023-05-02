@@ -32,6 +32,8 @@ class TapController(http.Controller):
         :param dict data: The feedback data (only `id`) and the transaction reference (`ref`)
                           embedded in the return URL
         """
+        if not data:
+            return request.redirect('/shop/payment')
         _logger.info("Received Tap return data:\n%s", pprint.pformat(data))
         request.env['payment.transaction'].sudo()._handle_notification_data('tap', data)
         return request.redirect('/payment/status')

@@ -1,7 +1,7 @@
 from odoo.addons.payment_tap.controllers.main import TapController
 import logging
 import pprint
-import phonenumbers
+# import phonenumbers
 from odoo import _, models
 from werkzeug import urls
 from odoo.exceptions import ValidationError
@@ -41,7 +41,11 @@ class PaymentTransaction(models.Model):
         :rtype: dict
         """
         user_lang = self.env.context.get('lang')
-        phone = phonenumbers.parse(self.partner_phone)
+        # if self.partner_phone:
+        #     phone = phonenumbers.parse(self.partner_phone)
+        # else:
+        #     phone = '+965 5555 00 34'
+            
         base_url = self.provider_id.get_base_url()
         redirect_url = urls.url_join(base_url, TapController._return_url)
         return {
@@ -88,10 +92,10 @@ class PaymentTransaction(models.Model):
                 "middle_name": None,
                 "last_name": self.partner_name,
                 "email": self.partner_email,
-                "phone": {
-                    "country_code": phone.country_code,
-                    "number": phone.national_number
-                }
+                # "phone": {
+                #     "country_code": phone.country_code,
+                #     "number": phone.national_number
+                # }
             },
             "order": {
                 "amount": f"{self.amount:.2f}",
